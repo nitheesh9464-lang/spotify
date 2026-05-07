@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify - Web Player: Music for everyone</title>
+    <meta name="description" content="A premium Spotify Web Player clone with full functionality and smooth UI.">
+    <link rel="icon" href="https://www.scdn.co/mirror/static/images/favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Splash / Loading Screen -->
+    <div id="loader" class="loader-overlay">
+        <div class="spotify-loader">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_White.png" alt="Spotify Logo">
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <a href="#" class="nav-item active" data-view="home">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="search">
+                        <i class="fas fa-search"></i>
+                        <span>Search</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="library">
+                        <i class="fas fa-book-open"></i>
+                        <span>Your Library</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <a href="#" class="nav-item" id="btn-add-local-songs">
+                        <i class="fas fa-file-import"></i>
+                        <span>Add Songs</span>
+                    </a>
+                    <a href="#" class="nav-item" id="btn-create-playlist-sidebar">
+                        <i class="fas fa-plus-square"></i>
+                        <span>Create Playlist</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="favorites">
+                        <i class="fas fa-heart"></i>
+                        <span>Liked Songs</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="collection">
+                        <i class="fas fa-book-open"></i>
+                        <span>Your Music</span>
+                    </a>
+                </div>
+                <!-- Hidden File Input -->
+                <input type="file" id="local-file-input" multiple accept="audio/*" style="display: none;">
+            </nav>
+
+            <div class="playlist-section">
+                <h3 class="playlist-title">Your Playlists</h3>
+                <ul class="playlist-list" id="sidebar-playlists">
+                    <!-- Playlists will be injected here -->
+                </ul>
+            </div>
+
+            <!-- Mini Visualizer Mini-Window -->
+            <div class="mini-viz-container">
+                <canvas id="mini-viz"></canvas>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-view" id="main-view">
+            <header id="app-header">
+                <div class="header-left">
+                    <div class="nav-arrows">
+                        <button id="nav-back"><i class="fas fa-chevron-left"></i></button>
+                        <button id="nav-forward"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="search-bar" id="top-search-bar" style="visibility: hidden; opacity: 0; transition: 0.3s;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="global-search" placeholder="What do you want to listen to?">
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="upgrade-btn">Explore Premium</button>
+                    <div class="user-badge" id="btn-user-profile">
+                        <img src="https://i.pravatar.cc/150?u=spotify_clone" alt="User Avatar">
+                        <span>Elite Dev</span>
+                        <i class="fas fa-caret-down"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- Home View -->
+                <div id="home-view" class="view-section">
+                    <h2 class="section-header" style="margin-top: 24px;">Good Morning</h2>
+                    <div class="recents-grid" id="recents-grid">
+                        <!-- Shimmer Placeholders -->
+                    </div>
+
+                    <div class="section-header">
+                        <h2>Made For You</h2>
+                        <a href="#">Show all</a>
+                    </div>
+                    <div class="grid-container" id="recommendations-grid">
+                        <!-- Dynamic Recommendations -->
+                    </div>
+
+                    <div class="section-header" style="margin-top: 40px;">
+                        <h2>Popular Releases</h2>
+                        <a href="#">Show all</a>
+                    </div>
+                    <div class="grid-container" id="recently-played-grid">
+                        <!-- Grid Cards -->
+                    </div>
+                </div>
+
+                <!-- Search View -->
+                <div id="search-view" class="view-section" style="display: none;">
+                    <div class="search-header">
+                        <h2 class="section-header">Top results</h2>
+                    </div>
+                    <div class="grid-container" id="search-grid"></div>
+                </div>
+
+                <!-- Liked Songs View -->
+                <div id="favorites-view" class="view-section" style="display: none;">
+                    <div class="playlist-header">
+                        <div class="playlist-img-large heart-bg">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="playlist-info">
+                            <p class="type-label">Playlist</p>
+                            <h1>Liked Songs</h1>
+                            <div class="playlist-stats">
+                                <span class="owner">Elite Dev</span> • <span id="liked-count">0</span> songs
+                            </div>
+                        </div>
+                    </div>
+                    <div class="track-list" id="liked-songs-list">
+                        <!-- Songs table here -->
+                    </div>
+                </div>
+
+                <!-- My Collection View (Formerly Local Files) -->
+                <div id="collection-view" class="view-section" style="display: none;">
+                    <div class="playlist-header">
+                        <div class="playlist-img-large folder-bg">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="playlist-info">
+                            <p class="type-label">Private Collection</p>
+                            <h1>Your Music</h1>
+                            <div class="playlist-stats">
+                                <span class="owner">Elite Dev</span> • <span id="collection-count">0</span> tracks
+                            </div>
+                        </div>
+                    </div>
+                    <div class="track-list" id="collection-list">
+                        <!-- Songs here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Player Bar (Sticky Bottom) -->
+        <footer class="player-bar">
+            <!-- Left: Current Track Info -->
+            <div class="now-playing">
+                <img src="https://via.placeholder.com/56" alt="Album Cover" class="now-playing-img" id="track-art">
+                <div class="now-playing-info">
+                    <span class="track-name" id="track-title">Ready to Play</span>
+                    <span class="track-artist" id="track-artist">Select a song</span>
+                </div>
+                <button class="btn-icon" id="btn-like-track">
+                    <i class="far fa-heart"></i>
+                </button>
+                <div class="visualizer-bars" id="mini-equalizer">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+
+            <!-- Center: Player Controls -->
+            <div class="player-controls-wrapper">
+                <div class="control-btns">
+                    <button class="btn-icon" id="btn-shuffle" title="Shuffle"><i class="fas fa-random"></i></button>
+                    <button class="btn-icon" id="btn-prev" title="Previous"><i class="fas fa-step-backward"></i></button>
+                    <button class="btn-icon btn-play-pause" id="btn-play-pause" title="Play/Pause">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="btn-icon" id="btn-next" title="Next"><i class="fas fa-step-forward"></i></button>
+                    <button class="btn-icon" id="btn-repeat" title="Repeat"><i class="fas fa-redo"></i></button>
+                </div>
+                <div class="progress-container">
+                    <span class="time" id="current-time">0:00</span>
+                    <div class="progress-bar-bg" id="seek-bar">
+                        <div class="progress-bar-fill" id="seek-fill"></div>
+                        <div class="progress-dot"></div>
+                    </div>
+                    <span class="time" id="total-time">0:00</span>
+                </div>
+            </div>
+
+            <!-- Right: Extra Controls -->
+            <div class="volume-extra-controls">
+                <button class="btn-icon" id="btn-lyrics" title="Lyrics"><i class="fas fa-microphone"></i></button>
+                <button class="btn-icon" id="btn-queue" title="Queue"><i class="fas fa-list"></i></button>
+                <button class="btn-icon" id="btn-volume-toggle" title="Volume"><i class="fas fa-volume-up"></i></button>
+                <div class="progress-bar-bg volume-bar" id="volume-bar">
+                    <div class="progress-bar-fill" id="volume-fill" style="width: 70%;"></div>
+                    <div class="progress-dot"></div>
+                </div>
+                <button class="btn-icon" id="btn-fullscreen" title="Fullscreen"><i class="fas fa-expand"></i></button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Lyrics / Full Page Overlay -->
+    <div id="lyrics-container" class="lyrics-overlay">
+        <button class="close-overlay" id="close-lyrics"><i class="fas fa-times"></i></button>
+        <div class="lyrics-content" id="lyrics-text">
+            Start playing a song to seevibes
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <!-- Hidden Audio Element -->
+    <audio id="main-audio" crossorigin="anonymous"></audio>
+
+    <!-- Main Logic -->
+    <script src="js/script.js"></script>
+</body>
+</html>
